@@ -1,0 +1,114 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;    
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-image: url('imagenes2/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.wrapper {
+    width: 85vmin;
+    height: 70vmin;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    border-radius: 5px;
+    background: #53aa47;
+}
+
+.wrapper-header{
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+}
+
+.game-details {
+    color: #FFFFFF;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 20px 27px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.difficulty-selection {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    color: #FFFFFF;
+}
+
+select {
+    padding: 5px;
+    margin: 0 10px;
+    border-radius: 5px;
+    border: none;
+    background: #3d87ff;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Estilo para el botón de inicio */
+.start-button {
+    display: inline-block;
+    background-color: #ffeb3b; /* Color dorado */
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.start-button:hover {
+    background-color: #ffc107; /* Efecto de color dorado */
+}
+
+/* Contenedor del tablero de juego */
+.play-board {
+    width: 100%;
+    height: 100%;
+    background: #aaffa2;
+    display: grid;
+    grid-template: repeat(30, 1fr) / repeat(30, 1fr);
+}
+
+.play-board .food {
+    background: #cf1f1f;
+}
+
+.play-board .head {
+    background: #217a21;
+}
+
+.obstacle {
+    background-color: black;  /* Color de los obstáculos */
+    border-radius: 5px;       /* Bordes suaves */
+}
+
+/* Contenedor de controles */
+.controls-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    padding: 10px;
+}

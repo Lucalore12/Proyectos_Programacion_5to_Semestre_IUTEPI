@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botón Redireccionar</title>
+</head>
+<body>
+    <button onclick="window.location.href='/menu/menu.html'">Salir al menú</button>
+</body>
+</html>
+
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Tetris</title>
+		<style>
+			body {
+				display: flex;
+				background: #202028;
+				color: #fff;
+				font-family: sans-serif;
+				font-size: 2em;
+				text-align: center;
+			}
+
+			.player {
+				flex: 1 1 auto;
+			}
+
+			canvas {
+				border: solid .2em #fff;
+				height: 85vh;
+			}
+		</style>
+	</head>
+	<body>
+		<audio controls autoplay loop>
+			<source src="music.m4a" type="audio/mpeg">
+			Tu navegador no soporta el elemento de audio.
+		</audio>
+		<div class="player">
+			<div class="score"></div>
+			<canvas class="tetris" width="240" height="400"></canvas>
+		</div>
+		<div id="gameOverMenu" style="display: none;">
+			<h2>¡Game Over!</h2>
+			<p id="finalScore">Puntuación final: 0</p>
+			<button id="restartButton">Volver al Menú</button>
+		</div>
+		
+		<style>
+			#gameOverMenu {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background-color: rgba(0, 0, 0, 0.8);
+				color: white;
+				padding: 20px;
+				border-radius: 10px;
+				text-align: center;
+				z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+			}
+		
+			/* Estilo adicional para el botón */
+			#restartButton {
+				margin-top: 15px;
+				padding: 10px 20px;
+				background-color: #5555ff;
+				color: white;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: background 0.3s;
+			}
+		
+			#restartButton:hover {
+				background-color: #3333cc;
+			}
+		</style>
+		
+
+		<div class="player">
+			<div class="score"></div>
+			<canvas class="tetris" width="240" height="400"></canvas>
+		</div>
+	
+		<script src="pieceFactory.js" ></script>
+		<script src="arena.js" ></script>
+		<script src="player.js" ></script>
+		<script src="tetris.js" ></script>
+		<script src="main.js" ></script>
+	</body>
+</html>

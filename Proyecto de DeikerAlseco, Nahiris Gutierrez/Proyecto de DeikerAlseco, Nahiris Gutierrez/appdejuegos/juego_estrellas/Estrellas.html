@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Estrellas</title>
+    <link rel="stylesheet" href="./style3.css">
+</head>
+<body>
+    <div class="controls-container">
+        <label for="difficulty">Selecciona la Dificultad:</label>
+        <select id="difficulty" class="difficulty-select" onchange="setDifficulty()">
+            <option value="fácil">Fácil</option>
+            <option value="medio">Medio</option>
+            <option value="difícil">Difícil</option>
+        </select>
+
+        <button id="startButton" class="start-button" onclick="startGame()">Iniciar Juego</button>
+    </div>
+
+    <div id="gameContainer"></div>
+
+    <script src="./src/phaser.min.js"></script>
+    <script src="./src/script2.js"></script>
+
+    <script>
+        function setDifficulty() {
+            const selector = document.getElementById('difficulty');
+            nivelDificultad = selector.value;
+        }
+
+        document.addEventListener('DOMContentLoaded', setDifficulty);
+    </script>
+</body>
+</html>

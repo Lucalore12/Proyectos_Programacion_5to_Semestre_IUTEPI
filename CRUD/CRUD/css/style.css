@@ -1,0 +1,34 @@
+body {
+  color: white;
+  background-color: #f8f9fa;
+  background-image: url("../img/fondo.jpg");
+
+}
+#btnUpdate {
+  display: none;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.btn {
+  font-weight: bold;
+}
+
+.btn-custom {
+  background-color: rgb(255, 255, 255);
+  color: black;
+  border: 1px solid #ddd; /* Agrega un borde para el estado normal */
+}
+
+.btn-custom:hover {
+  background-color: rgb(255, 255, 255);
+  color: black;
+  border: 1px solid #f8f9fa; /* Ajusta el borde para el estado hover */
+}
+

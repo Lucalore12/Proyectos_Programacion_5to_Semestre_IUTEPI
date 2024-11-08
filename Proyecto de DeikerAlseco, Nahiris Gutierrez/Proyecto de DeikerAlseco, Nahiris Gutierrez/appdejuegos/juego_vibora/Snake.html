@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Juego de la Serpiente</title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+	<div class="wrapper">
+		<div class="wrapper-header">
+			<div class="game-details">
+				<span class="score">Score: 0</span>
+				<span class="high-score">High Score: 0</span>
+			</div>
+			<div class="controls-container difficulty-selection">
+				<label for="difficulty">Selecciona la Dificultad:</label>
+				<select id="difficulty" class="difficulty-select">
+					<option value="easy">Fácil</option>
+					<option value="medium">Medio</option>
+					<option value="hard">Difícil</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="play-board"></div> <!-- Contenedor del juego -->
+	</div>
+
+	<script src="./script.js"></script>
+</body>
+
+</html>
