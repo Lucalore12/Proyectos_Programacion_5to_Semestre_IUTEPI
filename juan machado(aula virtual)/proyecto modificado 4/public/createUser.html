@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Nuevo Usuario</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+      .error-message {
+          color: red;
+          display: none;
+      }
+      /* Aquí puedes agregar más estilos para mejorar la apariencia */
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bienvenido al Aula Virtual</h1>
+    <nav>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+  
+  <main>
+    <div id="roleSection"></div>
+    <div id="createUserForm" style="display: none;">
+      <h2>Crear Nuevo Usuario</h2>
+      <form id="userForm">
+        <label for="username">Nombre de Usuario:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="apellido">Apellido:</label>
+        <input type="text" id="apellido" name="apellido" required>
+
+        <label for="cedula">Cédula:</label>
+        <input type="text" id="cedula" name="cedula" required>
+
+        <label for="correo">Correo:</label>
+        <input type="email" id="correo" name="correo" required>
+
+        <label for="role">Rol:</label>
+        <select id="role" name="role" required>
+          <option value="admin">Administrador</option>
+          <option value="profesor">Profesor</option>
+          <option value="estudiante">Estudiante</option>
+        </select>
+
+        <button type="submit">Crear Usuario</button>
+      </form>
+      <p class="error-message" id="formErrorMessage"></p> <!-- Mensaje de error del formulario -->
+    </div>
+    <p class="error-message" id="logoutErrorMessage"></p> <!-- Mensaje de error de cierre de sesión -->
+  </main>
+
+  <script>
+    const role = sessionStorage.getItem("role");
+
+    if (!role) {
+      window.location.href = 'login.html';
+    } else {
+      const roleSection = document.getElementById('roleSection');
+      const createUserForm = document.getElementById('createUserForm');
+
+      switch (role) {
+        case 'admin':
+          roleSection.innerHTML = `
+            <h2>Administración</h2>
+            <p>Desde aquí puedes gestionar los usuarios del sistema.</p>
+            <a href="manageUsers.html">Gestionar Usuarios</a>
+            <a href="viewLogs.html">Ver Registros de Actividad</a>
+          `;
+          createUserForm.style.display = 'block'; // Mostrar formulario para crear usuario
+          break;
+        case 'profesor':
+        case 'estudiante':
+          window.location.href = 'login.html'; // Redirigir si el rol no es admin
+          break;
+        default:
+          window.location.href = 'login.html'; // En caso de un rol no válido
+      }
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      const logoutErrorMessage = document.getElementById('logoutErrorMessage');
+      logoutErrorMessage.style.display = 'none'; // Ocultar mensaje de error al iniciar el cierre de sesión
+      
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          const errorData = await response.json();
+          logoutErrorMessage.textContent = errorData.message || 'Error al cerrar sesión';
+          logoutErrorMessage.style.display = 'block'; // Mostrar mensaje de error
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        logoutErrorMessage.textContent = 'Hubo un problema al intentar cerrar sesión.';
+        logoutErrorMessage.style.display = 'block'; // Mostrar mensaje de error
+      }
+    });
+
+    document.getElementById('userForm').addEventListener('submit', async (event) => {
+      event.preventDefault(); // Evitar el envío del formulario de manera predeterminada
+
+      const formErrorMessage = document.getElementById('formErrorMessage');
+      formErrorMessage.style.display = 'none'; // Ocultar mensaje de error al enviar el formulario
+
+      const formData = {
+        username: document.getElementById('username').value,
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        cedula: document.getElementById('cedula').value,
+        correo: document.getElementById('correo').value,
+        role: document.getElementById('role').value,
+      };
+
+      try {
+        const response = await fetch('/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          alert('Usuario creado exitosamente');
+          document.getElementById('userForm').reset(); // Reiniciar el formulario
+        } else {
+          const errorData = await response.json();
+          formErrorMessage.textContent = errorData.message || 'Error al crear el usuario';
+          formErrorMessage.style.display = 'block'; // Mostrar mensaje de error
+        }
+      } catch (error) {
+        console.error('Error al crear usuario:', error);
+        formErrorMessage.textContent = 'Ocurrió un error al intentar crear el usuario. Inténtalo de nuevo.';
+        formErrorMessage.style.display = 'block'; // Mostrar mensaje de error
+      }
+    });
+  </script>
+</body>
+</html>
+
+

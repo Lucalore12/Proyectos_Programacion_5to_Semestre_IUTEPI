@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Registros de Actividad</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Registros de Actividad</h1>
+    <nav>
+      <button id="logoutButton">Cerrar Sesión</button>
+      <button id="dashboardButton">Ir al Dashboard</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Registro de Actividades</h2>
+    <table id="logsTable">
+      <thead>
+        <tr>
+          <th>Fecha y Hora</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="logsTableBody">
+        <!-- Los logs se cargarán aquí -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+
+    // Aquí puedes implementar la lógica para cargar los registros
+    async function loadLogs() {
+      // Suponiendo que tienes una API que devuelve los registros de actividad
+      try {
+        const response = await fetch('/api/logs'); // Cambia esta URL según tu configuración
+        const logs = await response.json();
+        const logsTableBody = document.getElementById('logsTableBody');
+        logsTableBody.innerHTML = '';
+
+        logs.forEach(log => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${log.timestamp}</td>
+            <td>${log.username}</td>
+            <td>${log.action}</td>
+          `;
+          logsTableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error al cargar logs:', error);
+      }
+    }
+
+    // Cargar los logs al cargar la página
+    loadLogs();
+
+    // Manejador de evento para cerrar sesión
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+  </script>
+</body>
+</html>

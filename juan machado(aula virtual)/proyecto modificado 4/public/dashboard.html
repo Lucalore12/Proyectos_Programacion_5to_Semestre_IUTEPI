@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+      .error-message {
+          color: red;
+          display: none;
+      }
+      /* Aquí puedes agregar más estilos para mejorar la apariencia */
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bienvenido al Aula Virtual</h1>
+    <nav>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+  
+  <main>
+    <div id="roleSection"></div>
+    <p class="error-message" id="logoutErrorMessage"></p> <!-- Mensaje de error de cierre de sesión -->
+  </main>
+
+  <script>
+    const role = sessionStorage.getItem("role");
+
+    if (!role) {
+      window.location.href = 'login.html';
+    } else {
+      const roleSection = document.getElementById('roleSection');
+      
+      switch (role) {
+        case 'admin':
+          roleSection.innerHTML = `
+            <h2>Administración</h2>
+            <p>Desde aquí puedes gestionar los usuarios del sistema.</p>
+            <ul>
+              <li><a href="manageUsers.html">Gestionar Usuarios</a></li>
+              <li><a href="createUser.html">Crear Nuevo Usuario</a></li>
+              <li><a href="viewLogs.html">Ver Registros de Actividad</a></li>
+              <li><a href="listStudents.html">Lista de Estudiantes</a></li>
+              <li><a href="uploadTask.html">Subir Tareas</a></li>
+              <li><a href="viewTasks.html">Ver Tareas</a></li>
+              <li><a href="assignGrades.html">Asignar Notas</a></li>
+              <li><a href="uploadTaskForStudents.html">Entregar Tarea</a></li>
+              <li><a href="viewTasksForStudents.html">Ver Tareas</a></li>
+            </ul>
+          `;
+          break;
+        case 'profesor':
+          roleSection.innerHTML = `
+            <h2>Profesor</h2>
+            <p>Desde aquí puedes gestionar tareas y asignar notas.</p>
+            <ul>
+              <li><a href="uploadTask.html">Subir Tareas</a></li>
+              <li><a href="viewTasks.html">Ver Tareas</a></li>
+              <li><a href="assignGrades.html">Asignar Notas</a></li>
+              <li><a href="listStudents.html">Ver Lista de Estudiantes</a></li>
+              <li><a href="viewSubmittedTasks.html">Ver Tareas Enviadas por Estudiantes</a></li>
+            </ul>
+          `;
+          break;
+        case 'student':
+          roleSection.innerHTML = `
+            <h2>Estudiante</h2>
+            <p>Desde aquí puedes ver las tareas y entregar tus trabajos.</p>
+            <ul>
+              <li><a href="viewTasksForStudents.html">Ver Tareas</a></li>
+              <li><a href="uploadTaskForStudents.html">Entregar Tarea</a></li>
+              <li><a href="viewGrades.html">Ver Notas</a></li> <!-- Enlace a la página de notas -->
+            </ul>
+          `;
+          break;
+        default:
+          window.location.href = 'login.html'; // En caso de un rol no válido
+      }
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      const logoutErrorMessage = document.getElementById('logoutErrorMessage');
+      logoutErrorMessage.style.display = 'none'; // Ocultar mensaje de error al iniciar el cierre de sesión
+      
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          const errorData = await response.json();
+          logoutErrorMessage.textContent = errorData.message || 'Error al cerrar sesión';
+          logoutErrorMessage.style.display = 'block'; // Mostrar mensaje de error
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+        logoutErrorMessage.textContent = 'Hubo un problema al intentar cerrar sesión.';
+        logoutErrorMessage.style.display = 'block'; // Mostrar mensaje de error
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

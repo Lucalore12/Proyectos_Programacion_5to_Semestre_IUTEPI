@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asignar Notas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Asignar Notas</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <form id="assignGradeForm">
+      <label for="taskTitle">Título de la Tarea:</label>
+      <input type="text" id="taskTitle" name="taskTitle" required placeholder="Escribe el título de la tarea">
+
+      <label for="studentId">Estudiante:</label>
+      <select id="studentId" name="studentId" required>
+        <option value="">Cargando estudiantes...</option>
+      </select>
+
+      <label for="grade">Nota:</label>
+      <input type="number" id="grade" name="grade" required min="0" max="100" placeholder="Ingrese la nota">
+
+      <button type="submit">Asignar Nota</button>
+      <div id="message" style="color: red; margin-top: 10px;"></div>
+    </form>
+  </main>
+
+  <script>
+    // Cargar estudiantes al inicio
+    document.addEventListener('DOMContentLoaded', loadStudents);
+
+    async function loadStudents() {
+      const studentSelect = document.getElementById('studentId');
+      const messageDiv = document.getElementById('message');
+
+      try {
+        // Mostrar un mensaje temporal de carga
+        messageDiv.textContent = 'Cargando estudiantes...';
+        const response = await fetch('/api/users/students');
+        
+        if (!response.ok) throw new Error('Error al cargar estudiantes');
+
+        const students = await response.json();
+        studentSelect.innerHTML = ''; // Limpiar opciones anteriores
+
+        if (students.length === 0) {
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'No se encontraron estudiantes';
+          studentSelect.appendChild(option);
+        } else {
+          students.forEach(student => {
+            const option = document.createElement('option');
+            option.value = student.cedula;
+            option.textContent = `${student.nombre} (${student.correo})`;
+            studentSelect.appendChild(option);
+          });
+        }
+        messageDiv.textContent = ''; // Limpiar mensaje de carga
+      } catch (error) {
+        console.error('Error al cargar estudiantes:', error);
+        messageDiv.textContent = 'Error al cargar estudiantes. Intenta nuevamente.';
+        studentSelect.innerHTML = '<option value="">Error al cargar estudiantes</option>';
+      }
+    }
+
+    // Manejo del formulario para asignar nota
+    document.getElementById('assignGradeForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = '';
+
+      const formData = {
+        studentId: document.getElementById('studentId').value,
+        grade: Number(document.getElementById('grade').value),
+        taskTitle: document.getElementById('taskTitle').value
+      };
+
+      try {
+        const response = await fetch('/api/notas/assign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          messageDiv.textContent = 'Nota asignada exitosamente';
+          messageDiv.style.color = 'green';
+          document.getElementById('assignGradeForm').reset();
+        } else {
+          const errorData = await response.json();
+          messageDiv.textContent = errorData.message || 'Error al asignar la nota';
+          messageDiv.style.color = 'red';
+        }
+      } catch (error) {
+        console.error('Error al asignar la nota:', error);
+        messageDiv.textContent = 'Error de red al asignar la nota. Inténtalo de nuevo.';
+        messageDiv.style.color = 'red';
+      }
+    });
+
+    // Manejo de eventos para el logout
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html'; 
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

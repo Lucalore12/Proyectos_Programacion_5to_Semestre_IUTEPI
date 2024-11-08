@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Estudiantes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Lista de Estudiantes</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="studentList"></tbody>
+    </table>
+    <div id="loading" style="display: none;">Cargando estudiantes...</div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', loadStudents);
+
+    async function loadStudents() {
+      const loadingIndicator = document.getElementById('loading');
+      loadingIndicator.style.display = 'block'; // Mostrar indicador de carga
+
+      try {
+        const response = await fetch('/api/users/students');
+        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+        const students = await response.json();
+        const studentList = document.getElementById('studentList');
+        studentList.innerHTML = '';
+
+        if (students.length === 0) {
+          studentList.innerHTML = '<tr><td colspan="4">No hay estudiantes registrados.</td></tr>';
+          return;
+        }
+
+        students.forEach(student => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${student.cedula}</td>
+            <td>${student.nombre}</td>
+            <td>${student.correo}</td>
+            <td>
+              <button onclick="redirectToAssignGrade('${student.cedula}')">Asignar Nota</button>
+            </td>
+          `;
+          studentList.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Error al obtener estudiantes:', error);
+        alert('Hubo un problema al cargar los estudiantes.');
+      } finally {
+        loadingIndicator.style.display = 'none'; // Ocultar indicador de carga
+      }
+    }
+
+    function redirectToAssignGrade(studentId) {
+      // Redirigir a la página de asignación de notas con el ID del estudiante
+      window.location.href = `assignGrades.html?studentId=${studentId}`;
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html'; 
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+

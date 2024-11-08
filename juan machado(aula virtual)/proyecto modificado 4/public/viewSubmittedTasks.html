@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Tareas Enviadas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Tareas Enviadas por Estudiantes</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="loading" style="display: none;">Cargando tareas enviadas...</div>
+    <p id="errorMessage" class="error-message" style="display: none;"></p>
+    <table id="submittedTasksTable">
+      <thead>
+        <tr>
+          <th>ID de Tarea</th>
+          <th>Nombre del Estudiante</th>
+          <th>Archivo</th>
+          <th>Fecha de Envío</th>
+        </tr>
+      </thead>
+      <tbody id="submittedTasksList"></tbody>
+    </table>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const role = sessionStorage.getItem("role");
+
+      // Verificar si el usuario tiene permisos válidos
+      if (!role) {
+        alert('No tienes permisos para acceder a esta página.');
+        window.location.href = 'login.html';
+      } else {
+        loadSubmittedTasks();
+      }
+    });
+
+    async function loadSubmittedTasks() {
+      const loadingIndicator = document.getElementById('loading');
+      const errorMessage = document.getElementById('errorMessage');
+      loadingIndicator.style.display = 'block'; // Mostrar indicador de carga
+
+      try {
+        const response = await fetch('/api/tasks/submitted'); // Asegúrate de que esta URL sea correcta
+        if (!response.ok) {
+          throw new Error('Error al cargar las tareas'); // Lanzar error si la respuesta no es correcta
+        }
+        const tasks = await response.json();
+        const submittedTasksList = document.getElementById('submittedTasksList');
+        submittedTasksList.innerHTML = '';
+
+        if (tasks.length === 0) {
+          submittedTasksList.innerHTML = '<tr><td colspan="4">No hay tareas enviadas.</td></tr>';
+          return;
+        }
+
+        tasks.forEach(task => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${task.id}</td>
+            <td>${task.studentName || 'N/A'}</td>
+            <td><a href="${task.fileUrl || '#'}" target="_blank">${task.fileUrl ? 'Ver Archivo' : 'No disponible'}</a></td>
+            <td>${task.submissionDate || 'N/A'}</td>
+          `;
+          submittedTasksList.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Error al cargar tareas enviadas:', error);
+        errorMessage.textContent = 'Hubo un problema al cargar las tareas enviadas.';
+        errorMessage.style.display = 'block'; // Mostrar mensaje de error
+      } finally {
+        loadingIndicator.style.display = 'none'; // Ocultar indicador de carga
+      }
+    }
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html'; 
+    });
+  </script>
+</body>
+</html>
+
+
+

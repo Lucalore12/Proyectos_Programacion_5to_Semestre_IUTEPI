@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Tareas Asignadas</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Tareas Asignadas</h1>
+        <nav>
+            <button id="dashboardButton">Ir al Dashboard</button>
+            <button id="logoutButton">Cerrar Sesión</button>
+        </nav>
+    </header>
+
+    <main>
+        <div id="tasksContainer"></div> <!-- Contenedor para las tareas asignadas -->
+        <div id="message" style="color: red;"></div> <!-- Para mostrar mensajes -->
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAssignedTasks(); // Cargar las tareas al inicio
+        });
+
+        async function loadAssignedTasks() {
+            try {
+                const response = await fetch('/api/users/tasks/assigned', {
+                    method: 'GET',
+                    credentials: 'include' // Asegúrate de incluir las cookies de sesión
+                });
+                if (!response.ok) {
+                    console.error('Error en la respuesta:', response.status, response.statusText);
+                    throw new Error('Error al cargar las tareas asignadas');
+                }
+
+                const tasks = await response.json();
+                const tasksContainer = document.getElementById('tasksContainer');
+
+                // Asegúrate de que el contenedor de tareas existe
+                if (!tasksContainer) {
+                    console.error("El contenedor de tareas no existe en el DOM");
+                    return;
+                }
+
+                tasksContainer.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevas tareas
+
+                if (tasks.length === 0) {
+                    tasksContainer.innerHTML = '<p>No hay tareas asignadas.</p>';
+                } else {
+                    tasks.forEach(task => {
+                        console.log('Archivo de tarea:', task.file); // Para depuración
+                        const taskElement = document.createElement('div');
+                        taskElement.className = 'task';
+                        taskElement.innerHTML = `
+                            <h3>${task.title}</h3>
+                            <p>${task.description}</p>
+                            <a href="/uploads/${task.file.split('\\').pop()}" target="_blank">Descargar Archivo</a>
+                        `;
+                        tasksContainer.appendChild(taskElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = 'No se pudieron cargar las tareas asignadas. Inténtalo de nuevo.';
+                messageDiv.style.color = 'red'; // Color rojo para errores
+            }
+        }
+
+        // Manejo del botón de cerrar sesión
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/users/logout', { method: 'GET', credentials: 'include' });
+                
+                if (response.ok) {
+                    sessionStorage.removeItem("role");
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Error al cerrar sesión');
+                }
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        });
+
+        // Manejo del botón de ir al dashboard
+        document.getElementById('dashboardButton').addEventListener('click', () => {
+            window.location.href = 'dashboard.html'; 
+        });
+    </script>
+</body>
+</html>
+
+
+

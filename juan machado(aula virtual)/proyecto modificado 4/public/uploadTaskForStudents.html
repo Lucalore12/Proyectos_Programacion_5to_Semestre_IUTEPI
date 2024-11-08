@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir Tarea</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Subir Tarea</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+      <button id="viewTasksButton">Ver Tareas</button>
+      <button id="viewGradesButton">Ver Notas</button>
+    </nav>
+  </header>
+
+  <main>
+    <p class="loading" id="loadingIndicator" style="display: none;">Subiendo tarea...</p>
+    <p class="error-message" id="errorMessage" style="display: none;"></p>
+    <p class="success-message" id="successMessage" style="display: none;"></p>
+    <form id="uploadTaskForm" enctype="multipart/form-data">
+      <label for="title">Título:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="description">Descripción:</label>
+      <textarea id="description" name="description" required></textarea>
+
+      <label for="file">Archivo (opcional):</label>
+      <input type="file" id="file" name="file" accept=".pdf,.docx">
+
+      <button type="submit">Subir Tarea</button>
+    </form>
+  </main>
+
+  <script>
+    const role = sessionStorage.getItem("role");
+
+    // Verificar si el usuario tiene permisos válidos
+    if (!role) {
+      alert('No tienes permisos para acceder a esta página.');
+      window.location.href = 'login.html';
+    }
+
+    document.getElementById('uploadTaskForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+      const submitButton = event.target.querySelector('button[type="submit"]');
+
+      loadingIndicator.style.display = 'block'; // Mostrar indicador de carga
+      errorMessage.style.display = 'none'; // Ocultar mensaje de error
+      successMessage.style.display = 'none'; // Ocultar mensaje de éxito
+      submitButton.disabled = true; // Deshabilitar el botón
+
+      const formData = new FormData();
+      formData.append('title', document.getElementById('title').value);
+      formData.append('description', document.getElementById('description').value);
+
+      // Añadir archivo solo si el usuario seleccionó uno
+      const fileInput = document.getElementById('file').files[0];
+      if (fileInput) {
+        formData.append('file', fileInput);
+      }
+
+      try {
+        const response = await fetch('/api/tasks/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          successMessage.textContent = 'Tarea subida exitosamente';
+          successMessage.style.display = 'block'; // Mostrar mensaje de éxito
+          document.getElementById('uploadTaskForm').reset(); // Resetear formulario
+        } else {
+          const errorData = await response.json();
+          errorMessage.textContent = errorData.message || 'Error al subir la tarea';
+          errorMessage.style.display = 'block'; // Mostrar mensaje de error
+        }
+      } catch (error) {
+        console.error('Error al subir la tarea:', error);
+        errorMessage.textContent = 'Error al subir la tarea. Inténtalo de nuevo.';
+        errorMessage.style.display = 'block'; // Mostrar mensaje de error
+      } finally {
+        loadingIndicator.style.display = 'none'; // Ocultar indicador de carga
+        submitButton.disabled = false; // Habilitar el botón
+      }
+    });
+
+    // Manejador de eventos para cerrar sesión
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+
+    // Navegación a otras páginas
+    document.getElementById('viewTasksButton').addEventListener('click', () => {
+      window.location.href = 'viewTasksForStudents.html'; 
+    });
+
+    document.getElementById('viewGradesButton').addEventListener('click', () => {
+      window.location.href = 'viewGrades.html'; 
+    });
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html'; 
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+

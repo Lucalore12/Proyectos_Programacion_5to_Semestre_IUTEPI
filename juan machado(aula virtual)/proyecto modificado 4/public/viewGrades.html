@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Notas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Ver Notas</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <ul id="gradeList"></ul>
+    <p class="error-message" id="accessErrorMessage" style="color: red; display: none;"></p>
+  </main>
+
+  <script>
+    const role = sessionStorage.getItem("role");
+    const studentId = sessionStorage.getItem("userId");
+
+    // Verificar si el usuario tiene el rol de estudiante
+    if (!role || role !== 'student') {
+      window.location.href = 'login.html'; // Redirigir si no es un estudiante
+    } else {
+      loadGrades(studentId); // Cargar las notas del estudiante
+
+      // Función para cargar las notas del estudiante
+      async function loadGrades(studentId) {
+        try {
+          // Obtener las notas desde el backend
+          const response = await fetch(`/api/notas/${studentId}`); 
+          if (!response.ok) throw new Error('Error al cargar notas');
+
+          // Convertir la respuesta del archivo Excel a JSON
+          const arrayBuffer = await response.arrayBuffer();
+          const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+          const worksheet = workbook.Sheets['Notas']; // Suponiendo que la hoja se llama "Notas"
+          const grades = XLSX.utils.sheet_to_json(worksheet); // Convertir la hoja Excel a JSON
+
+          const gradeList = document.getElementById('gradeList');
+          gradeList.innerHTML = ''; // Limpiar la lista de notas antes de agregar nuevas
+
+          if (grades.length === 0) {
+            gradeList.innerHTML = '<li>No hay notas disponibles.</li>'; // Mensaje si no tiene notas
+            return;
+          }
+
+          // Mostrar las notas del estudiante
+          grades.forEach(grade => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <h3>Tarea: ${grade.taskTitle}</h3>
+              <p>Nota: ${grade.grade}</p>
+            `;
+            gradeList.appendChild(li); // Añadir cada nota a la lista
+          });
+        } catch (error) {
+          console.error('Error al obtener notas:', error);
+          alert('Hubo un problema al cargar las notas.');
+        }
+      }
+
+      // Evento para cerrar sesión
+      document.getElementById('logoutButton').addEventListener('click', async () => {
+        try {
+          const response = await fetch('/api/users/logout', { method: 'GET' });
+          if (response.ok) {
+            sessionStorage.clear(); // Limpiar sesión
+            window.location.href = 'login.html'; // Redirigir a la página de login
+          } else {
+            alert('Error al cerrar sesión');
+          }
+        } catch (error) {
+          console.error('Error al cerrar sesión:', error);
+        }
+      });
+
+      // Evento para ir al dashboard
+      document.getElementById('dashboardButton').addEventListener('click', () => {
+        window.location.href = 'dashboard.html'; // Redirigir al dashboard
+      });
+    }
+  </script>
+
+  <!-- Incluir la librería de xlsx.js para leer archivos Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</body>
+</html>
+
+
+

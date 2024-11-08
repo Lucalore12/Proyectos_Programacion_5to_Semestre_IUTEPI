@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestionar Usuarios</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Gestionar Usuarios</h1>
+    <nav>
+      <button id="logoutButton">Cerrar Sesión</button>
+      <button id="dashboardButton">Ir al Dashboard</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Lista de Usuarios</h2>
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Cédula</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="usersTableBody">
+        <!-- Los usuarios se cargarán aquí -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        const usersTableBody = document.getElementById('usersTableBody');
+        usersTableBody.innerHTML = ''; // Limpiar tabla antes de cargar
+
+        users.forEach(user => {
+          const row = document.createElement('tr');
+          row.setAttribute('data-username', user.username); // Asigna el username como atributo
+          row.innerHTML = `
+            <td>${user.nombre}</td>
+            <td>${user.apellido}</td>
+            <td>${user.cedula}</td>
+            <td>${user.correo}</td>
+            <td>${user.role}</td>
+            <td>
+              <button onclick="editUser('${user.username}')">Editar</button>
+              <button onclick="deleteUser('${user.username}')">Eliminar</button>
+            </td>
+          `;
+          usersTableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+      }
+    }
+
+    async function deleteUser(username) {
+      if (confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+        try {
+          const response = await fetch(`/api/users/${username}`, { method: 'DELETE' });
+          const message = await response.json();
+
+          if (response.ok) {
+            alert(message.message);
+            loadUsers(); // Recargar la lista de usuarios
+          } else {
+            alert(`Error al eliminar usuario: ${message.message}`);
+          }
+        } catch (error) {
+          console.error('Error al eliminar usuario:', error);
+          alert('Ocurrió un error al intentar eliminar el usuario. Inténtalo de nuevo.');
+        }
+      }
+    }
+
+    function editUser(username) {
+      const userRow = document.querySelector(`#usersTableBody tr[data-username="${username}"]`);
+      // Redirigir al formulario de edición (puedes ajustar la URL según tu estructura de archivos)
+      window.location.href = `createUser.html?editUsername=${username}`;
+    }
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+
+    // Cargar los usuarios al cargar la página
+    loadUsers();
+  </script>
+</body>
+</html>
+
+
+
+

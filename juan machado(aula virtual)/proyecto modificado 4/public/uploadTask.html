@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir Tareas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Subir Tareas</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <form id="uploadTaskForm" action="/api/users/tasks/uploads" enctype="multipart/form-data">
+      <label for="title">Título:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="description">Descripción:</label>
+      <textarea id="description" name="description" required></textarea>
+
+      <label for="file">Archivo:</label>
+      <input type="file" id="file" name="file" required>
+      <p id="fileInfo"></p>
+
+      <label for="assignedTo">Asignar a Estudiante:</label>
+      <select id="assignedTo" name="assignedTo" required>
+        <option value="">Seleccionar Estudiante</option>
+        <!-- Aquí se cargarán las opciones de estudiantes desde el servidor -->
+      </select>
+
+      <button type="submit">Subir Tarea</button>
+      <div id="message" style="color: red;"></div>
+    </form>
+  </main>
+
+  <script>
+    // Muestra la información del archivo seleccionado
+    document.getElementById('file').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const fileInfo = document.getElementById('fileInfo');
+        fileInfo.textContent = `Archivo: ${file.name} (Formato: ${file.type})`;
+      }
+    });
+
+    // Cargar estudiantes al formulario
+    const loadStudents = async () => {
+      try {
+        const response = await fetch('/api/users/students');
+        const students = await response.json();
+        
+        const select = document.getElementById('assignedTo');
+        students.forEach(student => {
+          const option = document.createElement('option');
+          option.value = student.cedula; // Usando cedula como valor
+          option.textContent = `${student.nombre} (${student.correo})`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error al cargar estudiantes:', error);
+      }
+    };
+
+    loadStudents(); // Cargar estudiantes al iniciar
+
+    document.getElementById('uploadTaskForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = ''; // Limpiar mensajes previos
+
+      const formData = new FormData();
+      formData.append('title', document.getElementById('title').value);
+      formData.append('description', document.getElementById('description').value);
+      formData.append('file', document.getElementById('file').files[0]);
+      formData.append('assignedTo', document.getElementById('assignedTo').value); // Añadir el estudiante asignado
+
+      try {
+        const response = await fetch('/api/tasks/uploads', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          messageDiv.textContent = 'Tarea subida exitosamente';
+          messageDiv.style.color = 'green'; // Color verde para éxito
+          document.getElementById('uploadTaskForm').reset();
+        } else {
+          messageDiv.textContent = 'Error al subir la tarea';
+          messageDiv.style.color = 'red'; // Color rojo para error
+        }
+      } catch (error) {
+        console.error('Error al subir la tarea:', error);
+        messageDiv.textContent = 'Error al subir la tarea. Inténtalo de nuevo.';
+        messageDiv.style.color = 'red';
+      }
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html'; 
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+

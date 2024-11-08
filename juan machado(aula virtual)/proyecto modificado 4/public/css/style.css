@@ -1,0 +1,144 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilo del cuerpo y fuente general */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4; /* Fondo suave */
+  color: #333; /* Color del texto */
+  line-height: 1.6; /* Mejora la legibilidad */
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 800px; /* Ancho máximo */
+  margin: 20px auto; /* Centrar y espacio superior */
+  padding: 20px; /* Espaciado interno */
+  background: white; /* Fondo blanco para formularios */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Estilo del encabezado */
+header {
+  background-color: #4CAF50; /* Color de fondo */
+  color: white; /* Color del texto */
+  padding: 20px; /* Espacio interno */
+  text-align: center; /* Centrar texto */
+}
+
+/* Estilo de títulos */
+h1 {
+  margin-bottom: 10px; /* Espacio inferior */
+}
+
+h2 {
+  margin-bottom: 15px; /* Espacio inferior */
+}
+
+/* Estilo de botones */
+button {
+  background-color: #d9534f; /* Color del botón */
+  color: white; /* Color del texto */
+  border: none; /* Sin borde */
+  padding: 10px 15px; /* Espaciado interno */
+  cursor: pointer; /* Cambia cursor */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: background-color 0.3s, transform 0.2s; /* Efecto de transición */
+}
+
+button:hover {
+  background-color: #c9302c; /* Color al pasar el ratón */
+  transform: scale(1.05); /* Aumentar tamaño en hover */
+}
+
+/* Estilo de formularios */
+form {
+  margin: 20px 0; /* Espacio superior e inferior */
+  padding: 15px; /* Espaciado interno */
+}
+
+/* Estilo de etiquetas */
+label {
+  display: block; /* Apilar etiquetas */
+  margin: 10px 0 5px; /* Espacio */
+}
+
+/* Estilo de inputs y selects */
+input[type="text"],
+input[type="file"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  width: 100%; /* Ancho completo */
+  padding: 10px; /* Espaciado interno */
+  margin-bottom: 15px; /* Espacio inferior */
+  border: 1px solid #ddd; /* Borde gris claro */
+  border-radius: 4px; /* Bordes redondeados */
+  transition: border-color 0.3s; /* Transición suave en el borde */
+}
+
+input[type="text"]:focus,
+input[type="file"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #4CAF50; /* Cambia el color del borde en foco */
+}
+
+/* Estilo de listas */
+ul {
+  list-style-type: none; /* Sin viñetas */
+  padding: 0; /* Sin padding */
+}
+
+ul li {
+  padding: 10px; /* Espacio interno */
+  border-bottom: 1px solid #ddd; /* Borde inferior */
+}
+
+ul li:last-child {
+  border-bottom: none; /* Sin borde en el último */
+}
+
+/* Estilos de alerta y éxito */
+.alert {
+  color: red; /* Color de texto */
+  font-weight: bold; /* Negrita */
+  padding: 10px; /* Espacio interno */
+  background-color: #f8d7da; /* Fondo alerta */
+  border: 1px solid #f5c6cb; /* Borde */
+  border-radius: 5px; /* Bordes redondeados */
+  margin-bottom: 15px; /* Espacio inferior */
+}
+
+.success {
+  color: green; /* Color de texto */
+  font-weight: bold; /* Negrita */
+  padding: 10px; /* Espacio interno */
+  background-color: #d4edda; /* Fondo éxito */
+  border: 1px solid #c3e6cb; /* Borde */
+  border-radius: 5px; /* Bordes redondeados */
+  margin-bottom: 15px; /* Espacio inferior */
+}
+
+/* Estilos responsivos */
+@media (max-width: 600px) {
+  .container {
+    padding: 10px; /* Menos padding en móviles */
+  }
+
+  button {
+    width: 100%; /* Botones de ancho completo en móviles */
+  }
+}
+
+

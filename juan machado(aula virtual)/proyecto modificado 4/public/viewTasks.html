@@ -1,0 +1,127 @@
+<!DOCTYPE html>  
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver Tareas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Ver Tareas</h1>
+    <nav>
+      <button id="dashboardButton">Ir al Dashboard</button>
+      <button id="logoutButton">Cerrar Sesión</button>
+    </nav>
+  </header>
+
+  <main>
+    <ul id="taskList"></ul>
+  </main>
+
+  <script>
+    const role = sessionStorage.getItem("role");
+
+    async function loadTasks() {
+      try {
+        const response = await fetch('/api/users/tasks'); // Cambiado a la ruta correcta
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        const tasks = await response.json();
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = '';
+
+        if (tasks.length === 0) {
+          taskList.innerHTML = '<li>No hay tareas asignadas.</li>';
+          return;
+        }
+
+        tasks.forEach(task => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <h3>${task.title}</h3>
+            <p>${task.description}</p>
+            <p>Publicado el: ${task.publicationDate || 'N/A'}</p>
+            <p>Fecha límite: ${task.dueDate || 'N/A'}</p>
+            <a href="${task.fileUrl || '#'}" target="_blank">${task.fileUrl ? 'Descargar Archivo' : 'No hay archivo disponible'}</a>
+          `;
+
+          // Solo los profesores pueden ver los botones de "Actualizar" y "Eliminar"
+          if (role === 'profesor') {
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Actualizar';
+            editButton.onclick = () => editTask(task.id);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.onclick = () => deleteTask(task.id);
+
+            li.appendChild(editButton);
+            li.appendChild(deleteButton);
+          }
+
+          taskList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error al obtener tareas:', error);
+        alert('Hubo un problema al cargar las tareas.');
+      }
+    }
+
+    async function editTask(taskId) {
+      // Aquí puedes implementar un formulario modal para editar la tarea
+      alert(`Función de edición para la tarea ${taskId} aún no implementada`);
+    }
+
+    async function deleteTask(taskId) {
+      const confirmDelete = confirm('¿Estás seguro de que deseas eliminar esta tarea?');
+      if (!confirmDelete) return;
+
+      try {
+        const response = await fetch(`/api/tasks/${taskId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          alert('Tarea eliminada con éxito');
+          loadTasks(); // Recargar la lista de tareas
+        } else {
+          alert('Error al eliminar la tarea');
+        }
+      } catch (error) {
+        console.error('Error al eliminar la tarea:', error);
+        alert('Error al eliminar la tarea. Inténtalo de nuevo.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadTasks);
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/users/logout', { method: 'GET' });
+        
+        if (response.ok) {
+          sessionStorage.removeItem("role");
+          window.location.href = 'login.html';
+        } else {
+          alert('Error al cerrar sesión');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    });
+
+    document.getElementById('dashboardButton').addEventListener('click', () => {
+      window.location.href = 'dashboard.html'; 
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
